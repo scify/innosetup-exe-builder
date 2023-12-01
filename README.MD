@@ -8,7 +8,31 @@ We created a thin flask application that serves as the builder for this app.
 
 This guide explains how to create a Windows executable using Inno Setup and Wine, utilizing a temporary Docker container as the builder. This functionality is utilized by our Flask application to generate the Windows executable installer at the request of our main Memor-i-Studio application.
 
-### Instructions to setup building exe installer manually
+
+
+
+## How to Setup/Run this app
+
+To run this app we will use gunicorn.
+
+### Create a virtual environment and install the dependencies
+
+
+To set up the environment and run the application, follow these steps:
+
+1. Install `virtualenv` by visiting the [official installation guide](https://virtualenv.pypa.io/en/latest/installation.html).
+2. Create a new environment by running `virtualenv env_name`. Refer to the [user guide](https://virtualenv.pypa.io/en/latest/user_guide.html) for more details.
+3. Activate the environment by running `source /path/to/newly/created/env/`.
+4. Install the required dependencies by running `pip install -r requirements.txt`.
+5. Navigate to the `project_root/src` directory.
+6. Run the application using the following command:
+    ```
+    gunicorn --conf gunicorn_conf.py --bind 0.0.0.0:<local-port> main:app
+    ```
+
+# Read more..
+
+## Instructions to setup building exe installer manually
 
 #### Creating Installers with Docker
 
@@ -60,22 +84,3 @@ fi
 exec docker run --rm -i -v $PWD:/work amake/innosetup:innosetup6 "$@"
 chmod 775 Output
 ```
-
-# How to setup this app
-
-To run this app we will use gunicorn.
-
-## Create a virtual environment and install the dependencies
-
-
-To set up the environment and run the application, follow these steps:
-
-1. Install `virtualenv` by visiting the [official installation guide](https://virtualenv.pypa.io/en/latest/installation.html).
-2. Create a new environment by running `virtualenv env_name`. Refer to the [user guide](https://virtualenv.pypa.io/en/latest/user_guide.html) for more details.
-3. Activate the environment by running `source /path/to/newly/created/env/`.
-4. Install the required dependencies by running `pip install -r requirements.txt`.
-5. Navigate to the `project_root/src` directory.
-6. Run the application using the following command:
-    ```
-    gunicorn --conf gunicorn_conf.py --bind 0.0.0.0:<local-port> main:app
-    ```
