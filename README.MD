@@ -1,8 +1,8 @@
 # memori-exe-builder
 
-The Memor-i-Studio project requires the ability to build a Windows executable installer. Previously, this was accomplished using wine and innoSetup on the same server. However, maintaining this setup has become increasingly difficult due to compatibility issues with newer 64-bit distributions. 
+The Memor-i-Studio project requires the ability to build a Windows executable installer. Previously, this was accomplished using wine and innoSetup on the same server. However, maintaining this setup has become increasingly difficult due to compatibility issues with newer 64-bit distributions.
 
-We created a thin flask application that serves as the builder for this app. 
+We created a thin flask application that serves as the builder for this app.
 
 ## Introduction
 
@@ -63,7 +63,7 @@ chmod 775 Output
 
 # How to setup this app
 
-To run this app we will use gunicorn. 
+To run this app we will use gunicorn.
 
 ## Create a virtual environment and install the dependencies
 
@@ -75,8 +75,7 @@ To set up the environment and run the application, follow these steps:
 3. Activate the environment by running `source /path/to/newly/created/env/`.
 4. Install the required dependencies by running `pip install -r requirements.txt`.
 5. Navigate to the `project_root/src` directory.
-6. Run the application using the following command: 
+6. Run the application using the following command:
     ```
     gunicorn --conf gunicorn_conf.py --bind 0.0.0.0:<local-port> main:app
     ```
-
