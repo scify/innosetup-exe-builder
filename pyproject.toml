@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "memori-exe-builder"
+name = "innosetup-exe-builder"
 version = "0.1.0"
 description = ""
-authors = ["Stefanos Koutoupis <skoutoupis@scify.org>"]
+authors = ["Stefanos Koutoupis <skoutoupis@scify.org>", "Paul Isaris <paul@scify.org>"]
 readme = "README.md"
-packages = [{include = "memori_exe_builder"}]
+packages = [{include = "innosetup_exe_builder"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
