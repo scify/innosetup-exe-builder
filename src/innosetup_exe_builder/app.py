@@ -1,6 +1,6 @@
 from flask import Flask
 
-from memori_exe_builder.api import api
+from innosetup_exe_builder.api import api
 
 
 def create_app(settings_overrides=None):
