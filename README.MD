@@ -28,7 +28,7 @@ To set up the environment and run the application, follow these steps:
 
 1. Install `virtualenv` by visiting the [official installation guide](https://virtualenv.pypa.io/en/latest/installation.html).
 2. Create a new environment by running `virtualenv env_name`. Refer to the [user guide](https://virtualenv.pypa.io/en/latest/user_guide.html) for more details.
-3. Activate the environment by running `source /path/to/newly/created/env/`.
+3. Activate the environment by running `source /path/to/newly/created/env/bin/activate`.
 4. Install the required dependencies by running `pip install -r requirements.txt`.
 5. Navigate to the `project_root/src` directory.
 6. Run the application using the following command:
