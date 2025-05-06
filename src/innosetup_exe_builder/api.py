@@ -67,8 +67,10 @@ def compile_exe():
     # --- Step 2: Run Inno Setup as before ---
     iss_dir = os.path.dirname(iss_path)
     iss_file = os.path.basename(iss_path)
+    uid = pwd.getpwnam('project_memori').pw_uid
+    gid = grp.getgrnam('www-data').gr_gid
     command = (
-        f'docker run --rm -i -v "{iss_dir}:/work" amake/innosetup:innosetup6 "{iss_file}"'
+        f'docker run --rm -i -v "{iss_dir}:/work" --user {uid}:{gid} amake/innosetup:innosetup6 "{iss_file}"'
     )
     result = subprocess.run(
         command,
@@ -87,6 +89,7 @@ def compile_exe():
     output_dir = os.path.join(iss_dir, "Output")
     try:
         subprocess.run(['chown', '-R', 'project_memori:www-data', iss_dir], check=True)
+        subprocess.run(['ls', '-lR', iss_dir])
     except Exception as e:
         return jsonify({
             "error": f"Failed to set ownership: {e}"
