@@ -83,4 +83,13 @@ def compile_exe():
             "stderr": result.stderr
         }), BAD_REQUEST
 
-    return jsonify({"result": 1, "output_dir": os.path.join(iss_dir, "Output")}), OK
+    # Set ownership of all .exe files in iss_dir and Output subdirectory
+    output_dir = os.path.join(iss_dir, "Output")
+    try:
+        subprocess.run(['chown', '-R', 'project_memori:www-data', iss_dir], check=True)
+    except Exception as e:
+        return jsonify({
+            "error": f"Failed to set ownership: {e}"
+        }), BAD_REQUEST
+
+    return jsonify({"result": 1, "output_dir": output_dir}), OK
