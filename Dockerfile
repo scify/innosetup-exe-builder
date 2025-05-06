@@ -12,8 +12,7 @@ RUN wget -O /tmp/launch4j.tgz https://sourceforge.net/projects/launch4j/files/la
     tar -xzf /tmp/launch4j.tgz -C /opt/launch4j --strip-components=1 && \
     rm /tmp/launch4j.tgz
 
-RUN rm /tmp/launch4j.tgz && \
-    chmod +x /opt/launch4j/launch4j && \
+RUN chmod +x /opt/launch4j/launch4j && \
     dos2unix /opt/launch4j/launch4j
 
 ENV PATH="/opt/launch4j:${PATH}"
