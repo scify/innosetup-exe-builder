@@ -36,6 +36,12 @@ def compile_exe():
     if not iss_path or not os.path.isfile(iss_path):
         return jsonify({"error": "Invalid or missing .iss file path"}), BAD_REQUEST
 
+    # Ensure Windows (CRLF) line endings for the .iss file
+    with open(iss_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    with open(iss_path, 'w', encoding='utf-8', newline='\r\n') as f:
+        f.write(content)
+
     iss_dir = os.path.dirname(iss_path)
     iss_file = os.path.basename(iss_path)
 
