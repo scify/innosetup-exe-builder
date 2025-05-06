@@ -3,6 +3,7 @@ import os
 from http.client import BAD_REQUEST, OK
 from flask import Flask, Blueprint, json,  jsonify, request
 from werkzeug.exceptions import HTTPException
+import pwd, grp
 
 from innosetup_exe_builder.helpers import check_invalid_params
 
@@ -23,6 +24,11 @@ def handle_exception(e):
     return response
 
 import os  # Import os to determine the top directory dynamically
+
+flask_user = 'project_memori'
+flask_group = 'www-data'
+uid = pwd.getpwnam(flask_user).pw_uid
+gid = grp.getgrnam(flask_group).gr_gid
 
 @api.route("/compile", methods=["POST"])
 def compile_exe():
@@ -48,7 +54,7 @@ def compile_exe():
     config_dir = os.path.dirname(launch4j_config_path)
     config_file = os.path.basename(launch4j_config_path)
     launch4j_cmd = (
-        f'docker run --rm -v "{config_dir}:/work" custom-launch4j /work/{config_file}'
+        f'docker run --rm -v \"{config_dir}:/work\" --user {uid}:{gid} custom-launch4j /work/{config_file}'
     )
     launch4j_result = subprocess.run(
         launch4j_cmd,
@@ -67,7 +73,7 @@ def compile_exe():
     iss_dir = os.path.dirname(iss_path)
     iss_file = os.path.basename(iss_path)
     command = (
-        f'docker run --rm -i -v "{iss_dir}:/work" amake/innosetup:innosetup6 "{iss_file}"'
+        f'docker run --rm -i -v \"{iss_dir}:/work\" --user {uid}:{gid} amake/innosetup:innosetup6 \"{iss_file}\"'
     )
     result = subprocess.run(
         command,
@@ -84,12 +90,6 @@ def compile_exe():
 
     # Set ownership of all .exe files in iss_dir and Output subdirectory
     output_dir = os.path.join(iss_dir, "Output")
-    try:
-        subprocess.run(['chown', '-R', 'project_memori:www-data', iss_dir], check=True)
-        subprocess.run(['ls', '-lR', iss_dir])
-    except Exception as e:
-        return jsonify({
-            "error": f"Failed to set ownership: {e}"
-        }), BAD_REQUEST
+
 
     return jsonify({"result": 1, "output_dir": output_dir}), OK
