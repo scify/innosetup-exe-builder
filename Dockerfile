@@ -1,7 +1,7 @@
 FROM openjdk:8-jre-slim
 
 # Install wget and tar
-RUN apt-get update && apt-get install -y wget tar && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y wget tar dos2unix && rm -rf /var/lib/apt/lists/*
 
 # Set Launch4j version
 ENV LAUNCH4J_VERSION=3.50
@@ -11,6 +11,10 @@ RUN wget -O /tmp/launch4j.tgz https://sourceforge.net/projects/launch4j/files/la
     mkdir -p /opt/launch4j && \
     tar -xzf /tmp/launch4j.tgz -C /opt/launch4j --strip-components=1 && \
     rm /tmp/launch4j.tgz
+
+RUN rm /tmp/launch4j.tgz && \
+    chmod +x /opt/launch4j/launch4j && \
+    dos2unix /opt/launch4j/launch4j
 
 ENV PATH="/opt/launch4j:${PATH}"
 
