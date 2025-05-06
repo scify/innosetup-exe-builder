@@ -28,22 +28,22 @@ import os  # Import os to determine the top directory dynamically
 @api.route("/compile", methods=["POST"])
 def compile_exe():
     """
-    Given a path and a file name, runs command to compile the executable.
+    Given a full path to a .iss file, runs command to compile the executable.
     Logs the steps into a log file located at the top directory of the project.
     """
-    path = request.form.get("path")
-    file_name = request.form.get("file_name")
-    if not file_name:
-        file_name = "memor-i_config.iss"
-    if check_invalid_params(path, file_name):
-        return jsonify({"error": "Invalid path or file name"}), BAD_REQUEST
+    iss_path = request.form.get("iss_path")
+    if not iss_path or not os.path.isfile(iss_path):
+        return jsonify({"error": "Invalid or missing .iss file path"}), BAD_REQUEST
+
+    iss_dir = os.path.dirname(iss_path)
+    iss_file = os.path.basename(iss_path)
 
     # Define the log file path at the top directory of the project
-    top_dir = os.path.dirname(os.path.abspath(__file__))  # Get current file's directory
-    log_file_path = os.path.join(top_dir, "../../compile_log.txt")  # Navigate to the top directory
+    top_dir = os.path.dirname(os.path.abspath(__file__))
+    log_file_path = os.path.join(top_dir, "../../compile_log.txt")
 
     command = (
-        f'docker run --rm -i -v "{path}:/work" amake/innosetup:innosetup6 "{file_name}"'
+        f'docker run --rm -i -v "{iss_dir}:/work" amake/innosetup:innosetup6 "{iss_file}"'
     )
     with open(log_file_path, "a") as log_file:
         result = subprocess.run(
@@ -51,9 +51,8 @@ def compile_exe():
             shell=True,
             capture_output=True,
             text=True
-        )  # NOQA: S602
+        )
 
-        # Write the output and errors to the log file
         log_file.write("Command executed:\n")
         log_file.write(command + "\n")
         log_file.write("Standard Output:\n")
