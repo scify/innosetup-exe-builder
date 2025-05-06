@@ -29,6 +29,7 @@ import os  # Import os to determine the top directory dynamically
 def compile_exe():
     """
     Given a full path to a .iss file, runs command to compile the executable.
+    The resulting .exe will be stored in the 'Output' subdirectory of the .iss file's directory.
     Logs the steps into a log file located at the top directory of the project.
     """
     iss_path = request.form.get("iss_path")
@@ -42,6 +43,7 @@ def compile_exe():
     top_dir = os.path.dirname(os.path.abspath(__file__))
     log_file_path = os.path.join(top_dir, "../../compile_log.txt")
 
+    # Mount the .iss directory to /work, and run the compiler on the file
     command = (
         f'docker run --rm -i -v "{iss_dir}:/work" amake/innosetup:innosetup6 "{iss_file}"'
     )
@@ -65,4 +67,5 @@ def compile_exe():
     if result.returncode != 0:
         return jsonify({"error": "Compilation failed. Check the log for details"}), BAD_REQUEST
 
-    return jsonify({"result": 1}), OK
+    # The .exe will be in iss_dir/Output
+    return jsonify({"result": 1, "output_dir": os.path.join(iss_dir, "Output")}), OK
