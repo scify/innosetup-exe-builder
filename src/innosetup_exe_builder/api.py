@@ -49,7 +49,7 @@ def compile_exe():
     config_dir = os.path.dirname(launch4j_config_path)
     config_file = os.path.basename(launch4j_config_path)
     launch4j_cmd = (
-        f'docker run --rm -v "{config_dir}:/work" progap/launch4j-build-image launch4j /work/{config_file}'
+        f'docker run --rm -v "{config_dir}:/work" custom-launch4j /work/{config_file}'
     )
     launch4j_result = subprocess.run(
         launch4j_cmd,
