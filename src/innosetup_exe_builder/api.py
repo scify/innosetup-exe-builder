@@ -33,8 +33,11 @@ def compile_exe():
     Logs the steps into a log file located at the top directory of the project.
     """
     iss_path = request.form.get("iss_path")
+    launch4j_config_path = request.form.get("launch4j_config_path")
     if not iss_path or not os.path.isfile(iss_path):
         return jsonify({"error": "Invalid or missing .iss file path"}), BAD_REQUEST
+    if not launch4j_config_path or not os.path.isfile(launch4j_config_path):
+        return jsonify({"error": "Invalid or missing Launch4j config path"}), BAD_REQUEST
 
     # Ensure Windows (CRLF) line endings for the .iss file
     with open(iss_path, 'r', encoding='utf-8') as f:
@@ -42,36 +45,42 @@ def compile_exe():
     with open(iss_path, 'w', encoding='utf-8', newline='\r\n') as f:
         f.write(content)
 
+    # --- Step 1: Run Launch4j ---
+    config_dir = os.path.dirname(launch4j_config_path)
+    config_file = os.path.basename(launch4j_config_path)
+    launch4j_cmd = (
+        f'docker run --rm -v "{config_dir}:/work" launch4j/launch4j launch4j /work/{config_file}'
+    )
+    launch4j_result = subprocess.run(
+        launch4j_cmd,
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+    if launch4j_result.returncode != 0:
+        return jsonify({
+            "error": "Launch4j failed",
+            "stdout": launch4j_result.stdout,
+            "stderr": launch4j_result.stderr
+        }), BAD_REQUEST
+
+    # --- Step 2: Run Inno Setup as before ---
     iss_dir = os.path.dirname(iss_path)
     iss_file = os.path.basename(iss_path)
-
-    # Define the log file path at the top directory of the project
-    top_dir = os.path.dirname(os.path.abspath(__file__))
-    log_file_path = os.path.join(top_dir, "../../compile_log.txt")
-
-    # Mount the .iss directory to /work, and run the compiler on the file
     command = (
         f'docker run --rm -i -v "{iss_dir}:/work" amake/innosetup:innosetup6 "{iss_file}"'
     )
-    with open(log_file_path, "a") as log_file:
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True
-        )
-
-        log_file.write("Command executed:\n")
-        log_file.write(command + "\n")
-        log_file.write("Standard Output:\n")
-        log_file.write(result.stdout + "\n")
-        log_file.write("Standard Error:\n")
-        log_file.write(result.stderr + "\n")
-        log_file.write("Exit Code:\n")
-        log_file.write(f"{result.returncode}\n\n")
-
+    result = subprocess.run(
+        command,
+        shell=True,
+        capture_output=True,
+        text=True
+    )
     if result.returncode != 0:
-        return jsonify({"error": "Compilation failed. Check the log for details"}), BAD_REQUEST
+        return jsonify({
+            "error": "Inno Setup compilation failed",
+            "stdout": result.stdout,
+            "stderr": result.stderr
+        }), BAD_REQUEST
 
-    # The .exe will be in iss_dir/Output
     return jsonify({"result": 1, "output_dir": os.path.join(iss_dir, "Output")}), OK
